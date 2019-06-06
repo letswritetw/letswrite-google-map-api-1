@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Multiple Markers - Google Map API demo</title>
+    <link rel="canonical" href="https://medium.com/@augustus0818/google-map-api-1-a4e794b0162f">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+      .container {
+        padding-top: 30px;
+        padding-bottom: 30px;
+      }
+      #map {
+        background: #CCC;
+      }
+      .fixed-bottom {
+        position: fixed;
+        left: 16px;
+        bottom: 0;
+        max-width: 320px;
+      }
+    </style>
+  </head>
+  <body>
+
+    <div id="app" class="container">
+
+      <div class="row">
+        <div class="col">
+          <div id="map" class="embed-responsive embed-responsive-16by9"></div>
+        </div>
+      </div>
+
+      <div class="row fixed-bottom">
+        <div class="col">
+          <div class="alert alert-info" role="alert">
+            Medium筆記文：<br/>
+            <a href="https://medium.com/@augustus0818/google-map-api-1-a4e794b0162f" target="_blank">Google Map API學習筆記-1</a>
+          </div>
+        </div>
+      </div>
+    
+    </div>
+    
+    <!-- 將 YOUR_API_KEY 替換成你的 API Key 即可 -->
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY" async defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vue/2.6.10/vue.min.js"></script>
+
+    <!-- map -->
+    <script>
+      const googleMap = new Vue({
+        el: '#app',
+        data: {
+          map: null
+        },
+        methods: {
+          // init google map
+          initMap() {
+            
+            // 預設顯示的地點：台北市政府親子劇場
+            let location = {
+              lat: 25.0374865, // 經度
+              lng: 121.5647688 // 緯度
+            };
+            
+            // 建立地圖
+            this.map = new google.maps.Map(document.getElementById('map'), {
+              center: location,
+              zoom: 16,
+              mapTypeId: 'terrain'
+            });
+
+            // 放置多個marker
+            fetch('./map.geojson')
+              .then(results => results.json())
+              .then(result => {
+                let res = result.features;
+                Array.prototype.forEach.call(res, r => {
+                  let latLng = new google.maps.LatLng(r.geometry.coordinates[0], r.geometry.coordinates[1]);
+                  let marker = new google.maps.Marker({
+                    position: latLng,
+                    map: this.map
+                  });
+                });
+            });
+
+          }
+        },
+        created() {
+          window.addEventListener('load', () => {
+            this.initMap();
+          });
+        }
+      });
+    </script>
+
+  </body>
+</html>
